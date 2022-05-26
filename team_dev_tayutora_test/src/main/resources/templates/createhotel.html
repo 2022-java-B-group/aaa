@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+layout:decorate="~{layout/layout2}">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+</head>
+
+<body>
+    <div layout:fragment="content1">
+        <h1>新規ホテル</h1>
+        <p th:text="${message}"></p>
+        <form action="/hotels/create" method="post">
+        
+        
+            <table>
+                <tr>
+                    <th>ホテル名</th>
+                    <td>
+                        <select name="category" >
+                            <option value="0">build a new hotel</option>
+                            <!-- <div th:each="hotel:${hotels}">
+                                <option th:value="${hotel.code}" th:text="${hotel.name}"></option>
+                            </div> -->
+                            <div th:each="category:${categories}">
+                                <option th:value="${category.code}" th:text="${category.nameHotel}"></option>
+                            </div>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>新しいホテル名</th>
+                    <td><input type="text" name="name"></td>
+                </tr>
+                <tr>
+                    <th>ホテルの場所</th>
+                    <td><input type="text" name="location"></td>
+                </tr>
+                <tr>
+                    <th><hr></th>
+                    <td><hr></td>
+                </tr>
+                <tr>
+                    <th>部屋ランク</th>
+                    <td>
+                        <select name="rank" id="">
+                            <option value="1">松</option>
+                            <option value="2">竹</option>
+                            <option value="3">梅</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>部屋数</th>
+                    <td><input type="text" name="amount"></td>
+                </tr>
+                <tr>
+                    <th>値段</th>
+                    <td><input type="text" name="price"></td>
+                </tr>
+            </table>
+            <input type="submit" value="送信">
+        
+        </form>
+        
+    </div>
+    
+</body>
+</html>

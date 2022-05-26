@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="C:\Users\student\Desktop\javasp\team_dev_tayutora\src\main\resources\static\css\header.css">
+    <title>Document</title>
+</head>
+<body>
+    
+    <div layout:fragment="header">
+        <header>
+            <h1>Tayutora</h1>
+            <nav class="gnav">
+                <ul class="menu">
+                    <li>
+                        <form action="/location" method="post">
+                            <select name="category" >
+                                <option value="0" selected>すべて表示</option>
+                                <div th:each="category:${session.categories}">
+                                    <option th:value="${category.code}" th:text="${category.name_hotel}"></option>
+                                </div>
+                            </select>
+                            <input type="submit" value="検索">
+                        </form>
+                    </li>
+                    <li th:if="${session.user.name_user}==null">
+                        <span><a href="/users/new">新規会員登録</a></span>
+                    </li>
+                    <li>
+                        <div th:if="${session.user.name_user}==null">
+                            <a href="/login">ログイン</a>
+                        </div>
+                        <!-- 菅澤さんよりURL取得 -->
+                        <div th:if="${session.user.name_user}!=null">
+                            <a href="/user_update2" th:text="${session.user.name_user}"></a>
+                        </div>
+                    </li>
+                    
+                    <li th:if="${session.user.admin}==1 ">
+                        <span><a href="/hotels/create">新規ホテル</a></span>
+                    </li>
+                    <li th:if="${session.user.admin}==1 ">
+                        <span><a href="/reserved/rooms">予約状況の確認</a></span>
+                    </li>
+                    <li th:if="${session.user.admin}==1 ">
+                        <span><a href="/users">ユーザ情報</a></span>
+                    </li>
+                    
+                    <a href=""></a>
+                </ul>
+            </nav>
+            
+        </header>
+    </div>
+
+    
+    
+</body>
+</html>
