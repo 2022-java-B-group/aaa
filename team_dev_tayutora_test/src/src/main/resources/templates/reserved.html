@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout/layout2}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>予約された部屋</title>
+
+</head>
+
+<body>
+    <div layout:fragment="content1">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="font-weight-bold">予約された部屋</h1>
+                    <div class="form-group">
+                        <form action="" method="post">
+                            <input type="date" name="date" required>
+                            <input type="submit" value="検索" class="btn-btn-primary">
+                        </form>
+                    </div>
+                    <h3 th:text="${day}"></h3>
+                    <span th:text="${message}" class="h3"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 mx-auto">
+                    <div th:if="${message}==null">
+                        <table class="table table-hover">
+                            <tr class="thead-light">
+                                <th>code</th>
+                                <th>ホテル名</th>
+                                <th>ホテルの場所</th>
+                                <th>タイプ</th>
+                                <th>値段</th>
+                            </tr>
+                            <tr th:each="room:${reservedRooms}">
+                                <td th:text="${room.code}"></td>
+                                <td th:text="${room.name_hotel}"></td>
+                                <td th:text="${room.location}"></td>
+                                <td>
+                                    <span th:if="${room.room_rank}==1">松</span>
+                                    <span th:if="${room.room_rank}==2">竹</span>
+                                    <span th:if="${room.room_rank}==3">梅</span>
+                                </td>
+                                <td th:text="${room.price}+  円"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>
