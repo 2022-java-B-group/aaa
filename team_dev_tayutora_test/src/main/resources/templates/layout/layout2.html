@@ -1,23 +1,28 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link th:href="@{/webjars/bootstrap/4.5.2/css/bootstrap.min.css}" rel="stylesheet">
+    <script th:src="@{/webjars/bootstrap/4.5.2/js/bootstrap.min.js}"></script>
+
     <title>Document</title>
 </head>
+
 <body>
 
     <div layout:replace="~{layout/header::header}"></div>
-    <hr>
-    <div layout:fragment="content1">
+
+    <div layout:fragment="content1" class="mt-3">
         <!-- To do -->
     </div>
-   
+
     <div layout:replace="~{layout/fotter::fotter}"></div>
 
-    
-    
+
+
 </body>
+
 </html>

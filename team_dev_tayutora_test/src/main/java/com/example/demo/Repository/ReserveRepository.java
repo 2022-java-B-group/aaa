@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ReserveRepository extends JpaRepository<Reserve, Integer>{
+public interface ReserveRepository extends JpaRepository<Reserve, Integer> {
     List<Reserve> findByCheckin(Date checkin);
-    
+
+    List<Reserve> findByIduser(Integer id_user);
+
 }

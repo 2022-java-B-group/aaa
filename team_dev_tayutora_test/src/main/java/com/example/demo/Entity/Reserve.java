@@ -23,12 +23,12 @@ public class Reserve {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "code")
     private Integer code;
-    
+
     @Column(name = "code_room")
     private Integer code_room;
     @Column(name = "id_user")
-    private Integer id_user;
-    
+    private Integer iduser;
+
     @Column(name = "reserve_day")
     private Date reserve_day;
 
@@ -38,16 +38,18 @@ public class Reserve {
     @Column(name = "price")
     private Integer price;
 
-    
-    
-    public  Reserve(Integer code_room, Integer id_user,Date reserve_day, Date checkin,Integer price) {
-        
+    public Reserve(Integer code_room, Integer id_user, Date reserve_day, Date checkin, Integer price) {
+
         super();
-        this.code_room=code_room;
-        this.id_user=id_user;
-        this.reserve_day=reserve_day;
-        this.checkin=checkin;
-        this.price=price;
+        this.code_room = code_room;
+        this.iduser = id_user;
+        this.reserve_day = reserve_day;
+        this.checkin = checkin;
+        this.price = price;
+    }
+
+    public Integer getId_user() {
+        return iduser;
     }
 
 }

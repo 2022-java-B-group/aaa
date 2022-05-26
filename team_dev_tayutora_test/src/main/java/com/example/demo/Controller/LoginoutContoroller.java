@@ -1,4 +1,4 @@
-    package com.example.demo.Controller;
+package com.example.demo.Controller;
 
 import java.util.List;
 
@@ -21,8 +21,8 @@ public class LoginoutContoroller {
 
 	@Autowired
 	UsersRepository usersRepository;
-	
-	//ログイン画面の表示
+
+	// ログイン画面の表示
 	@RequestMapping(value = "/login")
 	public String login() {
 		return "login";
@@ -30,49 +30,48 @@ public class LoginoutContoroller {
 	}
 
 	// ログインを実行
-	@RequestMapping(value="/login", method=RequestMethod.POST)
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public String doLogin(
 			@RequestParam("email") String email,
 			@RequestParam("password") String password,
-			Model model
-			) {
-		
-		//名前が空の場合にエラーとする
-		if(email == null || email.length() ==0) {
-			model.addAttribute("message", "emailを入力してください");
+			Model model) {
+
+		// 名前が空の場合にエラーとする
+		if (email == null || email.length() == 0) {
+			model.addAttribute("message", "Emailを入力してください");
 			return "login";
 		}
-		//パスワードが空の場合にエラーとする
-		if(password == null || password.length() ==0) {
+		// パスワードが空の場合にエラーとする
+		if (password == null || password.length() == 0) {
 			model.addAttribute("message", "パスワードを入力してください");
 			return "login";
 		}
-	
-		//Users user = usersRepository.findByEmailAndPassword(email, password).get(0);
+
+		// Users user = usersRepository.findByEmailAndPassword(email, password).get(0);
 		List<Users> users = usersRepository.findByEmailAndPassword(email, password);
-		
+
 		if (users.isEmpty()) {
-			
+
 			List<Users> emailList = usersRepository.findByEmail(email);
-			if(emailList.isEmpty()) {
+			if (emailList.isEmpty()) {
 				model.addAttribute("message", "アカウント情報がありません");
 				model.addAttribute("judge", "1");
-				return "login";			
-				
+				return "login";
+
 			}
-			
+
 			model.addAttribute("message", "パスワードが違います");
 			return "login";
-			
+
 		}
-		
-		session.setAttribute("user",users.get(0));
+
+		session.setAttribute("user", users.get(0));
+		session.setAttribute("name", users.get(0).getName_user());
 		session.setAttribute("message", "ログインしました！");
 		return "redirect:/hotels";
-		
+
 	}
-	
-	
+
 	// ログアウトを実行
 	@RequestMapping("/logout")
 	public String logout() {
@@ -82,17 +81,5 @@ public class LoginoutContoroller {
 		return "redirect:/hotels";
 
 	}
-	
-	
-	
-					
-		
-		
-		
+
 }
-	
-	
-	
-
-
-

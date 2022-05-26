@@ -29,24 +29,24 @@ public class Rooms {
 
     @Column(name = "location")
     private String location;
-    
+
     @Column(name = "room_rank")
     private Integer room_rank;
 
     @Column(name = "price")
     private Integer price;
 
-    public  Rooms(Integer code_category,String name_hotel, String location,  Integer room_rank, Integer price) {
+    public Rooms(Integer code_category, String name_hotel, String location, Integer room_rank, Integer price) {
         super();
-        this.codeCategory=code_category;
-        this.name_hotel=name_hotel;
-        this.location=location;
-        this.room_rank=room_rank;
-        this.price=price;
+        this.codeCategory = code_category;
+        this.name_hotel = name_hotel;
+        this.location = location;
+        this.room_rank = room_rank;
+        this.price = price;
     }
 
     public String getCode_category() {
         return codeCategory.toString();
     }
-    
+
 }

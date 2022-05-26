@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "category")
 public class Category {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "code")
@@ -32,25 +32,16 @@ public class Category {
     @Column(name = "room_number")
     private Integer room_number;
 
-
-
-
-    public  Category(String name_hotel, String location, Integer room_number) {
+    public Category(String name_hotel, String location, Integer room_number) {
         super();
-        this.nameHotel= name_hotel;
-        this.location=location;
-        this.room_number=room_number;
-        
+        this.nameHotel = name_hotel;
+        this.location = location;
+        this.room_number = room_number;
+
     }
-    
+
     public String getName_hotel() {
         return nameHotel;
     }
 
-   
-
-    
-    
-    
-    
 }

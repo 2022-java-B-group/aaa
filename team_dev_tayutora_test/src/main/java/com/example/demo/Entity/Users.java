@@ -9,7 +9,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,28 +40,23 @@ public class Users {
     @Column(name = "admin")
     private Integer admin;
 
-    
-    public  Users(String name_user, String address, String tel,String email,Date birthday,Integer sex ,String password) {
+    public Users(String name_user, String address, String tel, String email, Date birthday, Integer sex,
+            String password) {
         super();
-        this.name_user=name_user;
-        this.address=address;
-        this.tel=tel;
-        this.email=email;
-        this.birthday=birthday;
-        this.sex=sex;
-        this.password=password;
-        this.admin=0;
+        this.name_user = name_user;
+        this.address = address;
+        this.tel = tel;
+        this.email = email;
+        this.birthday = birthday;
+        this.sex = sex;
+        this.password = password;
+        this.admin = 0;
     }
-    // public  Users(int id,String name_user, String address, String tel,String email,String password,Date birthday,Integer sex,Integer admin) {
-    //     this(name_user, address,  tel,email, birthday, sex, password);
-    //     this.id = id;
-    //     this.admin=admin;
-    // }
 
-    public  Users(int admin) {
+    public Users(int admin) {
         super();
-        this.admin=admin;
-        
+        this.admin = admin;
+
     }
-    
+
 }

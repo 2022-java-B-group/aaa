@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -37,32 +38,43 @@ public class RoomsController {
     @Autowired
     HttpSession session;
 
-    //ホテルの一覧表示
+    // /でもtopに飛ぶ
+    @GetMapping("/")
+    public String home() {
+        session.removeAttribute("message");
+        return "redirect:/hotels";
+    }
+
+    // ホテルの一覧表示
     @GetMapping("/hotels")
     public ModelAndView showHotels(
-        ModelAndView mv
-    ) {
-       
-        Users user = (Users)session.getAttribute("user");
-        if (user==null) {
+            ModelAndView mv) {
+
+        Users user = (Users) session.getAttribute("user");
+        if (user == null) {
             user = new Users(0);
             session.setAttribute("user", user);
         }
-        System.out.println(user);
         session.setAttribute("categories", categoryRepository.findAll());
         List<Rooms> rooms = roomsRepository.findAll();
-        mv.addObject("rooms", rooms); 
-        mv.setViewName("top");    
+        mv.addObject("rooms", rooms);
+        mv.setViewName("top");
 
         return mv;
     }
 
-    //泊まりたい日を選択して空いている日の部屋を表示
+    // 泊まりたい日を選択して空いている日の部屋を表示
     @PostMapping("/hotels")
     public ModelAndView showbyDate(
-        @RequestParam(name = "date")String date,
-        ModelAndView mv
-    ) {
+            @RequestParam(name = "date") String date,
+            ModelAndView mv) {
+        if (date == null || date.length() == 0) {
+            List<Rooms> rooms = roomsRepository.findAll();
+            session.setAttribute("message", "日付を選択してください");
+            mv.addObject("rooms", rooms);
+            mv.setViewName("top");
+            return mv;
+        }
         Date checkin = Date.valueOf(date);
         session.setAttribute("checkin", checkin);
         List<Rooms> rooms = EmptyRooms(checkin);
@@ -70,28 +82,28 @@ public class RoomsController {
         mv.addObject("rooms", rooms);
         mv.setViewName("top");
         return mv;
-    
+
     }
-    //ホテルにより検索
+
+    // ホテルにより検索
     @PostMapping("/location")
     public ModelAndView showbyLocation(
-        @RequestParam(name = "category")Integer category,
-        ModelAndView mv
-    ) {
+            @RequestParam(name = "category") Integer category,
+            ModelAndView mv) {
         List<Rooms> rooms = new ArrayList<Rooms>();
-        if (category==0) {
+        if (category == 0) {
             rooms = roomsRepository.findAll();
-        }else{
+        } else {
             rooms = roomsRepository.findByCodeCategory(category);
         }
         session.removeAttribute("message");
         mv.addObject("rooms", rooms);
         mv.setViewName("top");
         return mv;
-        
+
     }
 
-    //ホテルを新しく作るformの表示
+    // ホテルを新しく作るformの表示
     @GetMapping("/hotels/create")
     public ModelAndView showform(ModelAndView mv) {
         List<Category> categories = categoryRepository.findAll();
@@ -100,25 +112,24 @@ public class RoomsController {
         return mv;
     }
 
-    //formより情報を受け取りホテルの作成
+    // formより情報を受け取りホテルの作成
     @PostMapping("/hotels/create")
     public String createhotel(
-        @RequestParam(name = "category")Integer category,
-        @RequestParam(name = "name")String name,
-        @RequestParam(name = "location")String location,
-        @RequestParam(name = "rank")Integer rank,
-        @RequestParam(name = "amount")Integer amount,
-        @RequestParam(name = "price")Integer price,
-        Model model
-    ) {
+            @RequestParam(name = "category") Integer category,
+            @RequestParam(name = "name") String name,
+            @RequestParam(name = "location") String location,
+            @RequestParam(name = "rank") Integer rank,
+            @RequestParam(name = "amount") Integer amount,
+            @RequestParam(name = "price") Integer price,
+            Model model) {
+
         if (category.equals(0)) {
-            if (name==null || name.length()==0) {
+            if (name == null || name.length() == 0) {
                 model.addAttribute("message", "ホテル名を入力してください。");
-                System.out.println("this method");
                 List<Category> categories = categoryRepository.findAll();
                 model.addAttribute("categories", categories);
                 return "test";
-            }else if (location==null || location.length()==0) {
+            } else if (location == null || location.length() == 0) {
                 model.addAttribute("message", "ホテルの場所を入力してください");
                 List<Category> categories = categoryRepository.findAll();
                 model.addAttribute("categories", categories);
@@ -126,18 +137,20 @@ public class RoomsController {
             }
             Category new_category = new Category(name, location, 10);
             categoryRepository.saveAndFlush(new_category);
-            category=categoryRepository.findByNameHotelAndLocation(name, location).get(0).getCode();
-        }else{
+            category = categoryRepository.findByNameHotelAndLocation(name, location).get(0).getCode();
+        } else {
             name = categoryRepository.findById(category).get().getName_hotel();
-            location =categoryRepository.findById(category).get().getLocation();
+            location = categoryRepository.findById(category).get().getLocation();
         }
-        
-        Rooms room = new Rooms(category,name, location, rank, price);
+
+        session.setAttribute("message", "ホテルが作成されました");
+        Rooms room = new Rooms(category, name, location, rank, price);
         roomsRepository.saveAndFlush(room);
 
         return "redirect:/hotels";
-        
+
     }
+
     // 予約状況の確認
     @GetMapping("/reserved/rooms")
     public ModelAndView reserved(ModelAndView mv) {
@@ -146,45 +159,43 @@ public class RoomsController {
         List<Rooms> reservedrooms = ReservedRooms(today);
         if (reservedrooms.isEmpty()) {
             mv.addObject("message", "予約はありません");
-        }else{
+        } else {
             mv.addObject("reservedRooms", reservedrooms);
         }
-        // mv.addObject("reservedRooms", reservedrooms);
         mv.addObject("day", today);
         mv.setViewName("reserved");
 
         return mv;
-       
+
     }
-    //日付より予約状況を出力
+
+    // 日付より予約状況を出力
     @PostMapping("/reserved/rooms")
     public ModelAndView reservedRoom(
-        @RequestParam(name = "date")String date,
-        ModelAndView mv
-    ) {
+            @RequestParam(name = "date") String date,
+            ModelAndView mv) {
         Date checkin = Date.valueOf(date);
         List<Rooms> reservedrooms = ReservedRooms(checkin);
         if (reservedrooms.isEmpty()) {
             mv.addObject("message", "予約はありません");
-        }else{
+        } else {
             mv.addObject("reservedRooms", reservedrooms);
         }
         mv.addObject("day", checkin);
         mv.setViewName("reserved");
 
         return mv;
-        
+
     }
 
     // 予約のある部屋を返す
     public List<Rooms> ReservedRooms(Date date) {
         ArrayList<Rooms> reservedroom = new ArrayList<>();
-        List<Reserve> reserves =  reserveRepository.findByCheckin(date);
+        List<Reserve> reserves = reserveRepository.findByCheckin(date);
         List<Rooms> rooms = roomsRepository.findAll();
-        System.out.println(reserves);
         if (reserves.isEmpty()) {
             return reservedroom;
-        }else{
+        } else {
             for (Reserve reserve : reserves) {
                 for (Rooms room : rooms) {
                     boolean judge = reserve.getCode_room().equals(room.getCode());
@@ -197,7 +208,7 @@ public class RoomsController {
         }
     }
 
-    //予約のない部屋を返す。 
+    // 予約のない部屋を返す。
     public List<Rooms> EmptyRooms(Date date) {
         List<Rooms> reservedrooms = ReservedRooms(date);
         List<Rooms> rooms = roomsRepository.findAll();
@@ -207,11 +218,22 @@ public class RoomsController {
                 boolean judge = rooms.get(i).getCode().equals(room2.getCode());
                 if (judge) {
                     rooms.remove(i);
-                }   
+                }
             }
         }
 
         return rooms;
     }
-    
+
+    // 管理者によりホテルの削除
+    @GetMapping("/hotels/delete/{code}")
+    public String delteHotels(
+            @PathVariable(name = "code") Integer code) {
+
+        roomsRepository.deleteById(code);
+        session.setAttribute("message", "ホテルが削除されました");
+        return "redirect:/hotels";
+
+    }
+
 }

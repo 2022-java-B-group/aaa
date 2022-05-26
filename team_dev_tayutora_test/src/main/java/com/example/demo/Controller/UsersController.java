@@ -1,6 +1,7 @@
 package com.example.demo.Controller;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -15,85 +16,95 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.example.demo.Entity.Reserve;
+import com.example.demo.Entity.ReserveByUser;
 import com.example.demo.Entity.Users;
+import com.example.demo.Repository.ReserveRepository;
 import com.example.demo.Repository.UsersRepository;
-
-
 
 @Controller
 
 public class UsersController {
 	@Autowired
 	HttpSession session;
-	
+
 	@Autowired
 	UsersRepository usersRepository;
-	
 
-	//新規会員登録の表示
+	@Autowired
+	ReserveRepository reserveRepository;
+
+	@Autowired
+	private ReserveByUser reserveByUser;
+
+	// 新規会員登録の表示
 	@RequestMapping("/users/new")
 	public ModelAndView showAdd(ModelAndView mv) {
 		mv.setViewName("users_new");
 		return mv;
 	}
-	
-	//formを受け取り新規登録
-	@RequestMapping(value="/user/create", method=RequestMethod.POST)
-	public  String create_user(
-			@RequestParam("name")String name,
-			@RequestParam("address")String address,
-			@RequestParam("tel")String tel,
-			@RequestParam("email")String email,
-			@RequestParam("birthday")Date birthday,
-			@RequestParam("sex")Integer sex,
-			@RequestParam("password")String password,
+
+	// formを受け取り新規登録
+	@RequestMapping(value = "/user/create", method = RequestMethod.POST)
+	public String create_user(
+			@RequestParam("name") String name,
+			@RequestParam("address") String address,
+			@RequestParam("tel") String tel,
+			@RequestParam("email") String email,
+			@RequestParam("birthday") Date birthday,
+			@RequestParam("sex") Integer sex,
+			@RequestParam("password") String password,
 			// @RequestParam("admin")Integer admin,
-			Model model
-			)	{
-		Users user =new Users(name, address,tel,email, birthday,sex ,password);
+			Model model) {
+		Users user = new Users(name, address, tel, email, birthday, sex, password);
 		usersRepository.saveAndFlush(user);
 		session.setAttribute("message", "登録が完了しました！");
-		
+
 		return "redirect:/hotels";
 	}
-	
-	
-	
-	
-	
-	//管理者によるアカウントの表示
+
+	// 管理者によるアカウントの表示
 	@RequestMapping("/users")
 	public ModelAndView users(ModelAndView mv) {
-		List<Users> usersList= usersRepository.findAll();
-		mv.addObject("users",usersList);
+		List<Users> usersList = usersRepository.findAll();
+		mv.addObject("users", usersList);
 		mv.setViewName("users");
-		
+
 		return mv;
 	}
-	
+
 	// 更新ボタン押下(管理者)管理者にするか否か
 	@RequestMapping(value = "/users_index/users/{id}/update", method = RequestMethod.POST)
 	public String updateUserByAdimn(
-			@PathVariable("id")Integer id,
-			@RequestParam("admin")Integer admin,
-			ModelAndView mv
-	) {
+			@PathVariable("id") Integer id,
+			@RequestParam("admin") Integer admin,
+			ModelAndView mv) {
 
 		// 更新処理
 		Users user = usersRepository.findById(id).get();
-		// Users updateuser = new Users(id,user.getName_user(),user.getAddress(),user.getTel(),user.getEmail(),user.getPassword(),user.getBirthday(),user.getSex(),admin);
-		Users updateuser = new Users(id, user.getName_user(), user.getAddress()	, user.getTel(), user.getEmail(), user.getBirthday(), user.getSex(), user.getPassword(), admin);
+		// Users updateuser = new
+		// Users(id,user.getName_user(),user.getAddress(),user.getTel(),user.getEmail(),user.getPassword(),user.getBirthday(),user.getSex(),admin);
+		Users updateuser = new Users(id, user.getName_user(), user.getAddress(), user.getTel(), user.getEmail(),
+				user.getBirthday(), user.getSex(), user.getPassword(), admin);
 		usersRepository.saveAndFlush(updateuser);
 		// リダイレクト
 		return "redirect:/users";
 	}
-	
 
 	// 削除ボタン押下(管理者)
 	@RequestMapping(value = "/users_index/users/{id}/delete", method = RequestMethod.POST)
 	public String deleteUserByAdmin(@PathVariable("id") int id) {
-		// 削除処理
+
+		Users user = (Users) session.getAttribute("user");
+		if (user.getId().equals(id)) {
+			usersRepository.deleteById(id);
+			session.setAttribute("message", "自分のアカウントが削除されました");
+			session.removeAttribute("user");
+			return "redirect:/hotels";
+		}
+
 		usersRepository.deleteById(id);
+		// 削除処理
 		// リダイレクト
 		return "redirect:/users";
 	}
@@ -101,49 +112,67 @@ public class UsersController {
 	// 画面表示（ユーザ情報）
 	@GetMapping("/user_update2")
 	public ModelAndView show(ModelAndView mv) {
-		
+
 		// ログイン情報取得
-		Users login = (Users)session.getAttribute("user");
+		Users login = (Users) session.getAttribute("user");
 		mv.addObject("user", login);
 		mv.setViewName("update");
 		return mv;
 	}
-	
+
 	// 更新
 	@RequestMapping(value = "/users/update", method = RequestMethod.POST)
 	public String update(
-		
+
 			@RequestParam("name_user") String name_user,
-			@RequestParam("address") String address, 
+			@RequestParam("address") String address,
 			@RequestParam("tel") String tel,
-			@RequestParam("email") String email, 
+			@RequestParam("email") String email,
 			@RequestParam("password") String password,
 			@RequestParam("birthday") String date,
-			@RequestParam("sex") Integer sex)
-		{
-			
-		System.out.println(name_user);
+			@RequestParam("sex") Integer sex) {
+
 		Date birthday = Date.valueOf(date);
-		Users user = (Users)session.getAttribute("user");
-			
-			// 更新処理
-		// Users updateuser = new Users(user.getId(),name_user,address,tel, email,birthday,sex,password,user.getAdmin());
-		Users updateuser = new Users(user.getId(), name_user, address, tel, email, birthday, sex, password, user.getAdmin());
+		Users user = (Users) session.getAttribute("user");
+
+		// 更新処理
+		Users updateuser = new Users(user.getId(), name_user, address, tel, email, birthday, sex, password,
+				user.getAdmin());
 		usersRepository.saveAndFlush(updateuser);
 		session.setAttribute("user", updateuser);
-		session.setAttribute("message", "ユーザ情報の更新をしました！");
+		session.setAttribute("message", "ユーザ情報の更新をしました");
 
 		return "redirect:/hotels";
 	}
 
-	// 削除ボタン押下
+	// 削除ボタン押下(By User)
 	@GetMapping(value = "/delete")
 	public String deleteByUser() {
 
-		Users user = (Users)session.getAttribute("user");	
+		Users user = (Users) session.getAttribute("user");
 		// 削除処理
 		usersRepository.deleteById(user.getId());
-		
-		return "finish";
+		session.setAttribute("message", "アカウントが削除されました");
+		session.removeAttribute("user");
+
+		return "redirect:/hotels";
+	}
+
+	@GetMapping("/user/reserves")
+	public ModelAndView showReservesByUser(
+			ModelAndView mv) {
+
+		Users user = (Users) session.getAttribute("user");
+		List<Reserve> reserved = reserveRepository.findByIduser(user.getId());
+		ArrayList<Object> reserves = new ArrayList<>();
+
+		for (Reserve reserve : reserved) {
+			reserves.add(reserveByUser.newuser(reserve.getCode()));
+		}
+
+		mv.addObject("reserves", reserves);
+		mv.setViewName("usersreserve");
+		return mv;
+
 	}
 }
